@@ -1,943 +1,771 @@
-#include <stdio.h>
-#include <unistd.h> 
-#include <stdlib.h>
 #include <iostream>
+#include <string>
+#include<stdlib.h>
 using namespace std;
 
-
-int main(){
-	cout<<"SAME PROGRAM SAME CODE : "<<endl;
-	pid_t pid;
-	pid=fork();
-
-	
-	if(pid<0){	
-		cout<<"Error , Child Not Created"<<endl;
-		
-	}
-	
-	else{
-		system("ls");
-	}
-	
-	
-	return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <stdio.h>
-#include <unistd.h> 
-#include <stdlib.h>
-#include <iostream>
-using namespace std;
-
-
-int main()
-{
-	cout<<"SAME PROGRAM D/F CODE : "<<endl;
-	pid_t pid;
-	pid=fork();
-	if(pid==0)
-	{
-		system("ls");
-	}
-	else if(pid<0)
-	{
-		cout<<"Error , Child Not Created"<<endl;
-	}
-
-	else
-	{
-		system("ls -l");
-	}
-	
-	
-	return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <stdio.h>
-#include <unistd.h> 
-#include <stdlib.h>
-#include <iostream>
-#include<sys/wait.h>
-using namespace std;
-
-int main()
-{
-	
-	pid_t pid;
-	pid=fork();
-	if(pid==0)
-	{
-		cout<<endl<<"This is a child process : "<<endl;
-		cout<<"Working directory is :  "<<endl;
-		execlp("pwd" , "pwd" , NULL);
-		cout<<endl;
-		
-	}
-	
-	else
-	{	
-		wait(NULL);
-		cout<<endl<<"Parent Process : "<<endl;
-		cout<<"Files in working directory are : "<<endl;
-		cout<<("ls" , "ls" , NULL);
-		cout<<endl;
-	}
-
-	return 0;
-}
-
-
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-int main(){
-	
-	printf("\nKernel Version:\n");
-	system("cat /proc/sys/kernel/osrelease");
-	printf("\n-- CPU ----\n");
-	system("cat /proc/cpuinfo | awk 'NR==3{print}'");
-	system("cat /proc/cpuinfo | awk 'NR==4{print}'");
-	system("cat /proc/cpuinfo | awk 'NR==5{print}'");
-	printf("\n");
-	
-	return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-int main(){
-	
-	printf("\nKernel Version:\n");
-	system("cat /proc/sys/kernel/osrelease");
-	printf("\nConfigured Memory:\n");
-	system("cat /proc/meminfo | awk 'NR==1{print $2}'");
-	printf("\nAmount of Free Memory:\n");
-	system("cat /proc/meminfo | awk 'NR==2{print $2}'");
-	printf("\nAmount of Used Memory:\n");
-	system("cat /proc/meminfo | awk '{if(NR==1) a=$2; if(NR==2) b=$2} END {print a-b}'");
-	
-	return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-
-int main(int argc, char *argv[]){
-	if (argc < 3){
-		fprintf(stderr, "Correct Usage: ./main <src_filename> <src_filename>\n");
-		return -1;
-	}
-	
-	char buf;
-	int fd1, fd2, n;
-	if ((fd1 = open(argv[1], O_RDONLY)) < 0){
-		fprintf(stderr, "Could not read %s\n", argv[1]);
-		return 2;
-	}
-
-	if ((fd2 = creat(argv[2], 0666)) < 0){
-		fprintf(stderr, "Could not write to %s\n", argv[2]);
-    		return 2;
-	}
-	
-	while ((n = read(fd1, &buf, 1)) > 0)
-		write(fd2, &buf, 1);
-
-	printf("Copied contents of %s to %s\n", argv[1], argv[2]);
-	close(fd1);
-	close(fd2);
-	return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <iostream>
-#include <stdlib.h>
-using namespace std;
-	
-struct Process{
-	int pID;
-	float at;
-	float bt;
-	float ct;
-	float wt;
-	float tat;
+struct Node{
+    int data;
+    Node *next;
 };
 
-void calCompTime(struct Process *p, int n){
-  	p[0].ct = p[0].bt;  
-  	
-	for(int i=1; i<n; i++){
-		p[i].ct = p[i-1].ct + p[i].bt;
-  	}
-}
-
-void calTurnAdTime(struct Process *p, int n){
-	for(int i=0; i<n; i++){
-    		p[i].tat = p[i].ct - p[i].at;
-  	}
-}
-
-
-void calWaitTime(struct Process *p, int n){
-  	for(int i=0; i<n; i++){
-    		p[i].wt = p[i].tat - p[i].bt;
-  	}
-}
-
-void printAvgTime(struct Process *p, int n){
-	calCompTime(p, n);
-	calTurnAdTime(p, n);
-	calWaitTime(p, n);
-
-  	cout << "\n process  ArrivalTime  BurstTime  CompletionTime  TurnAroundTime  WaitingTime \n";
-  	for (int i=0; i<n; i++){
-   		cout << "  " << p[i].pID << " \t\t" << p[i].at << "\t" << p[i].bt << " \t\t " 
-		   << p[i].ct << "\t\t" << p[i].tat << "\t\t" << p[i].wt << " \n";
-  	}
-
-  	// Calculating sum of wt and tat
-  	float sumW = 0.0;
-  	float sumT = 0.0;
-  	for (int i=0; i<n; i++){
-    		sumW += p[i].wt;
-    		sumT += p[i].tat;
-  	}
-
-  	// Printing average wt and tat
-  	cout << "\n Average Waiting Time: " << sumW/n;
-  	cout << "\n Average Turn Around Time: " << sumT/n << endl;
-}
-
-
-int main(){
-	int n;
-
-	cout << "\n Enter number of Processes: ";
-	cin >> n;
-	cout << endl;
-	
-	Process p[n];
-	for(int i=0; i<n; i++){
-		p[i].pID = i+1;
-		cout << " Enter Arrival Time of Process " << i+1 << ": ";
-		cin >> p[i].at;
-		cout << " Enter Burst Time of Process " << i+1 << ": ";
-		cin >> p[i].bt;
-		cout << endl;
-	}
-	
-	printAvgTime(p, n);
-	cout << endl;
-
-	return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <iostream>
-using namespace std;
-
-struct Proc {
-    int no, at, bt, it, ct, tat, wt, rt;
-};
-
-class SJF {
-public:
-    int n;
-    Proc p[10];
-
-    void readProc() {
-        cout << "<--SJF Scheduling Algorithm (Non-Preemptive)-->\n";
-        cout << "Enter Number of Processes: ";
-        cin >> n;
-
-        for (int i = 0; i < n; i++)
-            p[i] = read(i + 1);
-    }
-
-    Proc read(int i) {
-        Proc process;
-        cout << "\nProcess No: " << i << endl;
-        process.no = i;
-        cout << "Enter Arrival Time: ";
-        cin >> process.at;
-        cout << "Enter Burst Time: ";
-        cin >> process.bt;
-        return process;
-    }
-
-    void sortProc() {
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (p[j].at > p[j + 1].at) {
-                    Proc temp = p[j];
-                    p[j] = p[j + 1];
-                    p[j + 1] = temp;
-                }
-            }
-        }
-    }
-	void calCompTime() {
-	    int j, min = 0;
-	
-	    for (int i = 0; i < n; i++) {
-	        for (j = i + 1, min = i; j < n && p[j].at <= p[i - 1].ct; j++) {
-	            if (p[j].bt < p[min].bt)
-	                min = j;
-	        }
-	
-	        Proc temp = p[i];
-	        p[i] = p[min];
-	        p[min] = temp;
-	
-	        if (i == 0) {
-	            p[i].it = p[i].at;
-	        }
-			else 
-			{
-	            if (p[i].at <= p[i - 1].ct)
-	                p[i].it = p[i - 1].ct;
-	            
-				else
-	                p[i].it = p[i].at;
-	        }
-	
-	        p[i].ct = p[i].it + p[i].bt;
-	    }
-}
-
-    void calTatWT() {
-        float avgtat = 0, avgwt = 0;
-
-        cout << "\nProcess\tAT\tBT\tCT\tTAT\tWT\n";
-        for (int i = 0; i < n; i++) {
-            p[i].tat = p[i].ct - p[i].at;
-            avgtat += p[i].tat;
-            p[i].wt = p[i].tat - p[i].bt;
-            avgwt += p[i].wt;
-            cout << "P" << p[i].no << "\t" << p[i].at << "\t" << p[i].bt << "\t" << p[i].ct << "\t" << p[i].tat << "\t" << p[i].wt << "\t" << endl;
-        }
-
-        avgtat /= n;
-        avgwt /= n;
-        cout << "\nAverage TurnAroundTime=" << avgtat << endl;
-        cout << "Average WaitingTime=" << avgwt << endl;
-    }
-};
-int main() {
-    SJF scheduler;
-    scheduler.readProc();
-    scheduler.sortProc();
-    scheduler.calCompTime();
-    scheduler.calTatWT();
-    return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include <iostream>
-#define MIN -9999
-using namespace std;
-
-struct Process{
-    int no, at, bt, ct, wt, tat, pri, status;
-};
-
-Process read(int i){ 
-    struct Process p;
-    cout << "\nProcess No: " << i << endl;
-    p.no = i;
-    cout << "Enter Priority: ";
-    cin >> p.pri;
-    cout << "Enter Arrival Time: ";
-    cin >> p.at;
-    cout << "Enter Burst Time: ";
-    cin >> p.bt;
-
-    p.status = 0;
-    return p;
-}
-
-int main(){
-    int n, l, ct = 0, remaining;
-    struct Process p[10], temp;
-    float avgtat = 0, avgwt = 0;
-    
-    cout << " Non-Preemptive First Scheduling Algorithm (Higher No.-->High Priority)\n\n";
-    cout << "Enter Number of Processes: ";
-    cin >> n;
-
-    for (int i = 0; i < n; i++)
-        p[i] = read(i + 1);
-
-    for (int i = 0; i < n - 1; i++)
-        for (int j = 0; j < n - i - 1; j++)
-            if (p[j].at > p[j + 1].at) {
-                temp = p[j];
-                p[j] = p[j + 1];
-                p[j + 1] = temp;
-            }
-
-
-    p[9].pri = MIN;
-    remaining = n;
-    cout << "\nProcessNo\tAT\tBT\tPri\tCT\tTAT\tWT\n";
-
-    ct = p[0].at; 
-    
-    while(remaining != 0){
-    	l = 9; 
-    	
-	    for (int i = 0; i < n; i++) {
-	        if (p[i].at <= ct && p[i].status != 1 && p[i].pri > p[l].pri) {
-	            l = i;
-	        }
-	    }
-	
-	    p[l].ct = ct = ct + p[l].bt; 
-	    p[l].tat = p[l].ct - p[l].at; 
-	    p[l].wt = p[l].tat - p[l].bt; 
-	    p[l].status = 1; 
-	    
-	    avgtat += p[l].tat; 
-	    avgwt += p[l].wt;  
-	    remaining--; 
-	
-	    cout << "P" << p[l].no << "\t\t" << p[l].at << "\t" << p[l].bt << "\t" 
-		<< p[l].pri << "\t" << p[l].ct << "\t" << p[l].tat << "\t" << p[l].wt << "\t"  << endl;
-	}
-
-    avgtat /= n;
-    avgwt /= n;
-    cout << "\nAverage TurnAroundTime=" << avgtat << "\nAverage WaitingTime=" << avgwt;
-
-    return 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include<pthread.h>
-#include<stdio.h>
-#include<thread>
-#include<iostream>
-#include<cstdlib>
-using namespace std;
-
-void *print(void *p);
-
-int main(int argc, char **argv){
-	pthread_t tid;
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	
-    if(argc!=2){
-        cout<<"Error you have give wrong argument \n";
-        return -1;
-    }
-
-    if(atoi(argv[1])< 0){
-        cout<<"\n Integer value must be greater than 0.\n";
-        return -1;
-    }
-    
-	int a = atoi(argv[1]);
-	
-	pthread_create(&tid , &attr , print , &a);
-	pthread_join(tid , NULL);
-	
-    return 0;
-}
-
-void *print(void *p){
-	int i ; 
-	int num = *(int*)(p);
-	int sum  = 0;
-	cout<<"\nI am inside a thread function \n"<<endl;
-	for(i=1;i<=num;i++)
-	sum += i;
-	
-	cout<<"Sum is : "<<sum<<endl<<endl;
-	pthread_exit(0);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#include<iostream>
-using namespace std;
-
-class MemoryManagementAlgo{
+class LLAdt{
 private:
-	
-int *block_size;
-int total_blocks;
-int *process_size;
-int total_process;
-int *allocation;	
+    Node *first ;
+    Node *second ; //other two pointer for concat
+    Node *third ;
 
-public:  
-	void input(); 
-    void First_Fit();
-    void Best_Fit();
-    void Worst_Fit() ;  
+public:
+   LLAdt(){
+     first = NULL;
+    }
+    
+    int length(Node *p);    
+    void insertfirst(int x);
+    void insertAtPosition(int value, int pos);
+    void deletefirst();
+    int deleteAtPosition(int index);
+    Node* search(int key);
+    void create(int A[], int n);
+    void create2(int B[], int n);
+    void Concat();
+	void Display() ; 
 };
 
-void MemoryManagementAlgo :: input(){	
-    cout << "Enter the number of blocks available : ";
-    cin >> total_blocks;
+int LLAdt :: length(Node *p){
+	int c=0;
+	p=first;
+	while(p){
+	    c++;
+	    p=p->next;
+	}
+	return c ;
+}
 
-    block_size = new int[total_blocks];
-    cout << "Enter block sizes : " << endl;
-    for (int i = 0; i < total_blocks; i++){
-        cout << i + 1 << " - ";
-        cin >> block_size[i];
+void LLAdt :: insertfirst(int x){
+    Node *t;
+    t = new Node;
+    t->data = x;
+    t->next = first;
+    first = t;
+}
+
+void LLAdt :: insertAtPosition(int value, int pos) {
+    if (pos < 0 || pos > length(first)){
+    	cout<<"Index is not in range \n"<<endl ;
+    	
+    	return;
+	}
+    	
+    struct Node *p, *t;
+    p = first;
+    t = new Node;
+    if (pos == 0){
+        t->data = value;
+        t->next = first;
+        first = t;
     }
-
-    cout << "Enter the number of processes available : ";
-    cin >> total_process;
-
-    process_size = new int[total_process];
-    cout << "Enter process sizes : " << endl;
-    for (int i = 0; i < total_process; i++){
-        cout << i + 1 << " - ";
-        cin >> process_size[i];
+    else if (pos > 0){
+        for (int i = 0; i < pos - 1 && p; i++) {
+            p = p->next;
+        }
+        t->data = value;
+        t->next = p->next;
+        p->next = t;
     }
 }
 
-void MemoryManagementAlgo :: First_Fit(){
-	 // intialization
-    allocation = new int[total_process];
-    for (int i = 0; i < total_process; i++){
-        allocation[i] = -1;
-    }
-	
-	//--->loop of process and block
-    for (int i = 0; i < total_process; i++){
-        for (int j = 0; j < total_blocks; j++){
-            if (block_size[j] >= process_size[i]){
-                allocation[i] = j;
-                block_size[j] -= process_size[i];
-                break;
-            }
-        } 
-    }
-    
-    cout << "Process No.\t\tProcess Size\t\tBlock no." << endl;
-    for (int i = 0; i < total_process; i++){
-        cout << " " << i + 1 << " \t\t\t" << process_size[i] << " \t\t\t";
-        if (allocation[i] != -1){
-            cout << allocation[i] + 1;
-        }
-        else{
-            cout << "Not Allocated";
-        }
-        cout << endl;
-    }	
-    
-    // Reset block sizes to their original values
-    for (int i = 0; i < total_process; i++) {
-            if (allocation[i] != -1) {
-                block_size[allocation[i]] += process_size[i]; 
-            }
-        }
+void LLAdt :: deletefirst(){
+    Node *p = first;
+    first = first->next;
+    int x = p->data;
+    delete p;
 }
 
-void MemoryManagementAlgo :: Best_Fit(){	
-	 // intialization
-    allocation = new int[total_process];
-    for (int i = 0; i < total_process; i++){
-        allocation[i] = -1;
-    }
-	
-	//process
-    for (int i = 0; i < total_process; i++){
-        // Find the best fit block for current process
-        int bestIdx = -1;
-        for (int j = 0; j < total_blocks; j++){
-            if (block_size[j] >= process_size[i]){
-                if (bestIdx == -1){
-                    bestIdx = j;
-                }
-                else if (block_size[bestIdx] > block_size[j]){
-                    bestIdx = j;
-                }
-            }
-        }
-        if (bestIdx != -1){
-            // allocate block j to p[i] process
-            allocation[i] = bestIdx;
-            // Reduce available memory in this block.
-            block_size[bestIdx] -= process_size[i];
-        }
+int LLAdt :: deleteAtPosition(int index){
+    struct Node *p=first , *q=NULL;
+    int x=-1;
+    
+    if(index<0 || index>length(p)){
+    	cout<<" Index given higher than element present \n";
+    	return -1;
+    } 
+    
+    if(index==1){
+        x=first->data;
+        first=first->next;
     }
     
-    cout << "Process No.\t\tProcess Size\t\tBlock no." << endl;
-    for (int i = 0; i < total_process; i++){
-        cout << " " << i + 1 << " \t\t\t" << process_size[i] << " \t\t\t";
-        if (allocation[i] != -1){
-            cout << allocation[i] + 1;
+	else{
+        for(int i=0;i<index-1;i++){
+            q=p;
+            p=p->next;
         }
-        else{
-            cout << "Not Allocated";
-        }
-        cout << endl;
-    }	
-    
-    // Reset block sizes to their original values
-    for (int i = 0; i < total_process; i++) {
-            if (allocation[i] != -1) {
-                block_size[allocation[i]] += process_size[i]; 
-            }
-        }
+        x=p->data;
+        q->next=p->next;
+    }
+
+    delete p;
+    return x;
 }
 
-void MemoryManagementAlgo :: Worst_Fit(){
-	 // intialization
-    allocation = new int[total_process];
-    for (int i = 0; i < total_process; i++){
-        allocation[i] = -1;
+Node* LLAdt :: search(int key){
+ 	Node *p=first;
+    while(p){
+        if(key==p->data){
+            cout<<"Pointer of the Node is "<<endl ;
+            return p;
+        }p=p->next ;
     }
+    return NULL;
+}
+
+void LLAdt :: create(int A[], int n){
+    Node *last, *t;
+    first = new Node;
+    first->data = A[0];
+    first->next = NULL;
+    last = first;
+
+    for (int i = 1; i < n; i++){
+        t = new Node;
+        t->data = A[i];
+        t->next = NULL;
+        last->next = t;
+        last = t;
+    }
+}
+
+void LLAdt ::  create2(int B[], int n){
+    Node *last, *t;
+    second = new Node;
+    second->data = B[0];
+    second->next = NULL;
+    last = second;
+
+    for (int i = 1; i < n; i++){
+        t = new Node;
+        t->data = B[i];
+        t->next = NULL;
+        last->next = t;
+        last = t;
+    }
+}
+
+void LLAdt :: Display(){
+	int i=0 ;
+        Node *p=first;
+
+		while(p){
+            cout<<p->data;
+            p=p->next;
+        
+        if (i < length(p) - 1){  
+            	cout << "--> ";
+                i++ ;
+        }
+     }cout<<endl;
+}
 	
-    for (int i = 0; i < total_process; i++){
-        // Find the best fit block for current process
-        int worstIdx = -1;
-        for (int j = 0; j < total_blocks; j++){
-            if (block_size[j] >= process_size[i]){
-                if (worstIdx == -1){
-                    worstIdx = j;
-                }
-                else if (block_size[worstIdx] < block_size[j]){
-                    worstIdx = j;
-                }
-            }
-        }
-        if (worstIdx != -1){
-            // allocate block j to p[i] process
-            allocation[i] = worstIdx;
-            // Reduce available memory in this block.
-            block_size[worstIdx] -= process_size[i];
-        }
+void LLAdt :: Concat(){   
+    Node *p=first ,*q=second ;
+    third = p;
+    while (p->next){
+        p = p->next;
     }
+    p->next = q;
+    cout<<"Concatenated Elements are "<<endl;
+}
+
+int main(){	
+    LLAdt LinkedList;
+
+	int A[] = {1, 4, 5, 6, 9};
+    LinkedList.create(A, 5);
+
+    int B[] = {2, 3, 7, 8};
+    LinkedList.create2(B, 4);
     
-    cout << "Process No.\t\tProcess Size\t\tBlock no." << endl;
-    for (int i = 0; i < total_process; i++){
-        cout << " " << i + 1 << " \t\t\t" << process_size[i] << " \t\t\t";
-        if (allocation[i] != -1){
-            cout << allocation[i] + 1;
+    
+class Node {
+    public:
+    Node *prev;
+    int data;
+    Node *next;
+};
+
+class DoublyLL{
+    private:
+        Node *first=NULL;
+    public:
+        DoublyLL(int A[],int n);
+        void Display();
+        int Length();
+        void InsertHead(int x);
+        void InsertEnd(int x);
+        int RemoveHead();
+        int RemoveEnd();
+        ~DoublyLL();
+};
+
+DoublyLL :: ~DoublyLL(){
+    Node *p=first ,*q ;
+    while(p){
+        q=p;
+        p=p->next;
+        cout<<"\n"<<"Removed :"<<q->data;
+        delete q;
+    }
+}
+
+DoublyLL::DoublyLL(int A[],int n){
+    Node *last,*t;
+    first=new Node;
+    first->data=A[0];
+    first->prev=first->next=NULL;
+    last=first;
+    
+    for(int i=1;i<n;i++){
+        t=new Node;
+        t->data=A[i];
+        t->next=NULL;        
+        t->prev=last;
+        last->next=t;
+        last=t;
+    }
+}
+
+void DoublyLL::InsertHead(int x){ //before first node 
+    Node *t,*p=first;
+    t=new Node;
+    t->data=x;  
+    
+    t->next=first;
+    p->prev = t ;
+    first=t;
+}
+
+void DoublyLL::InsertEnd(int x) {
+	Node *p = first ;
+    Node *t = new Node;
+    t->data = x;
+    t->next = NULL ;
+
+    if(first == NULL) { // If the list is empty
+        t->prev = NULL ;
+        first = t;
+        
+    } 
+	else{
+        while(p->next!= NULL ){
+        	p=p->next;
+		}            
+        p->next=t;
+        t->prev=p;
+    }
+}
+
+int DoublyLL::RemoveHead(){
+    Node *p=first;
+    int x;
+
+    first=first->next;
+    x=p->data;
+    delete p;
+				        
+    return x;
+   
+}
+
+int DoublyLL::RemoveEnd() {
+    Node *p = first;
+    int x;
+
+    if (first == NULL) {
+        cout << "List is empty, cannot remove from the end." << endl;
+        return -1; 
+    }
+
+    while (p->next != NULL) {
+        p = p->next;
+    }
+
+    x = p->data;
+    
+    if (p->prev != NULL) {
+        p->prev->next = NULL;
+    } 
+	else {
+        // If p->prev is NULL, it means the list had only one element
+        first = NULL;
+    }
+
+    delete p;
+
+    return x;
+}
+
+int DoublyLL::Length(){
+    Node *p=first;
+    int x=0;
+    while(p){
+        x++  ; // or  ++x;
+        p=p->next;
+    }
+    return x;
+}
+
+void DoublyLL::Display() {
+        int i=0 ;
+        Node *p=first;
+
+		while(p){
+            cout<<p->data;
+            p=p->next;
+        
+        if (i < Length() - 1){  //just added if cond upto which print fun upto length() -1
+            	cout << "<--> ";
+                i++ ;
+        }
+     }cout<<endl;
+}
+
+class CircularLinkedList{
+    private:
+        Node *Head;
+    public:
+        CircularLinkedList(int A[],int n);
+        void display();
+        int length();
+        Node* search(int key);
+        void insert(int index,int value);
+        int Delete(int index);
+};
+
+CircularLinkedList::CircularLinkedList(int A[],int n){
+    Node *last,*t ;
+    
+    Head=new Node;  
+    Head->data=A[0] ;
+    Head->next=Head ;   // Point to itself since it's a circular list
+    last=Head ;
+    for(int i=1;i<n;i++){
+        t=new Node ;
+        t->data=A[i] ;
+        t->next=last->next ;   // Point to itself since it's a circular list
+        last->next=t ;
+        last=t ;
+    }
+}
+
+int CircularLinkedList::length(){
+    Node *p=Head;
+    int l=0;
+    do
+    {
+        l++;
+        p=p->next;
+    }while(p!=Head);
+    return l;
+
+}
+
+void CircularLinkedList::insert(int index,int value){
+    if(index<0 || index>length())  //length is a fun()
+        return ;
+
+    Node *p=Head,*t;
+    t=new Node;
+    t->data=value;
+    if(index==0){
+        if(Head==NULL){
+            t->next=t;
+            Head=t;
         }
         else{
-            cout << "Not Allocated";
+            while(p->next!=Head)
+                p=p->next;
+            t->next=p->next;
+            p->next=t;
+
         }
-        cout << endl;
-    }	
+    }
+    else{
+        for(int i=0;i<index-1;i++)
+            p=p->next;
+        t->next=p->next;
+            p->next=t;
+    }
+}
+
+int CircularLinkedList::Delete(int index){
+    if(index<0 || index>length())
+        return -1;
+
+    Node *p=Head,*q;
+    int x,i;
+    if(index==1){
+        while(p->next!=Head)
+            p=p->next;
+        if(p==Head){
+            x=p->data;
+            delete p;
+            Head=NULL;
+            return x;
+        }
+        x=Head->data;
+        p->next=Head->next;
+        delete Head;
+        Head=p->next;
+        return x;
+    }
+    else{
+        for(i=0;i<index-1;i++)
+            p=p->next;
+        q=p->next;
+        x=q->data;
+        p->next=q->next;
+        delete q;
+        return x;
+    }
+}
+
+Node* CircularLinkedList :: search(int key){
+ 	Node *p= Head;
+ 	
+    do{
+        if(key==p->data){
+            cout<<"Pointer of the Node is  " ;
+            return p;
+        }p=p->next ;
+    }while(p!=Head);
     
-    // Reset block sizes to their original values
-    for (int i = 0; i < total_process; i++) {
-            if (allocation[i] != -1) {
-                block_size[allocation[i]] += process_size[i]; 
-            }
-        }
+    return NULL;
+}
+
+void CircularLinkedList::display(){
+    Node *p=Head;
+    do{
+        cout<<p->data<<"->";
+        p=p->next;
+
+    }while(p!=Head);
+    cout<<endl;
+}
+
+int main() {
+    int A[] = {1, 3, 5, 8, 9};
+
+    CircularLinkedList l(A, 5);
+    int choice;    
+
+#include<iostream>
+using namespace std;
+
+struct Stack{
+    int size ;
+    int top ;
+    int *S ;
+} ;
+
+void create(Stack *st){ //already keyword as stack-->cause ambiguity
+    cout<<"Enter size of stack \n";
+    cin>>st->size ;
+    st->top = -1 ;
+    st->S = new int[st->size] ; //This is for storing size of Stack 
+}
+
+void display(Stack st){
+        for(int i=st.top ; i>=0 ; i-- ){
+            cout<<st.S[i]<<" " ;
+        }cout<<endl ;
+}
+
+void push(Stack *st , int x){
+    if(st->top==st->size -1){
+        cout<<"Stack is full ";
+    }
+    else{
+        st->top ++ ;
+        st->S[st->top]=x ;
+    }
+}
+
+int pop(Stack *st){
+    int x =-1 ;
+    if(st->top== -1){
+        cout<<"Stack is empty ";
+    }
+    else{
+        x = st->S[st->top];
+        st->top--;
+    }
+    return x;
+}
+
+int peek(Stack st , int pos){
+    int x = -1 ;
+    if(st.top -pos + 1 < 0 ){
+        cout<<"Invalid index ";
+    }
+    else{
+        x = st.S[st.top-pos +1];
+    }
+    return x ;
+}
+
+int stackTop(Stack st ){
+    if(st.top== -1){
+        return -1;
+    }
+    else{
+        return st.S[st.top];
+    }
+}
+
+bool isEmpty(Stack st){
+    if(st.top==-1){
+        return 1 ;
+    }
+    return 0 ;
+}
+
+bool isFull(Stack st){
+    if(st.top= st.size - 1){
+        return 1 ;
+    }
+    return 0 ;
 }
 
 int main(){
-  	MemoryManagementAlgo ob ;
-  	int choice;
-  	ob.input();
+    struct Stack st ;
+    create(&st);
 
-do{
-    cout << "\nEnter choice : \n1 - First Fit \n2 - Best Fit \n3 - Worst Fit\n";  
-    cin >> choice;
-       
-    switch (choice){
-    case 1:
-    {
-        cout << "Your choice : First Fit" << endl;
-        ob.First_Fit();
-        break;
-    }
-    case 2:
-    {
-        cout << "Your choice : Best Fit" << endl;
-        ob.Best_Fit();
-        break;
-    }
-    case 3:
-    {
-        cout << "Your choice : Worst Fit" << endl;
-        ob.Worst_Fit();
-        break;
-    }
-    default:
-    {
-        cout << "Invalid choice" << endl;
-        break;
-    }
-  }
-}while(true);
+    push(&st , 10);
+    cout<<"Inserted 1st element  ";
+    display(st);
+
+    push(&st , 40);
+    cout<<"Inserted 2nd element ";
+    display(st);
+
+    push(&st , 80);
+    cout<<"Inserted 3rd element ";
+    display(st);
+
+    pop(&st);
+    cout<<"Deleted last inserted element \n ";
+    display(st);
+
+  
+    cout<<"POS at 2 --> "<< peek(st , 2)<<endl<<endl;
+    cout<<stackTop(st)<<" "<<isEmpty(st)<<" "<<isFull(st) ;
+
     return 0;
 }
 
+#include<iostream>
+using namespace std ;
+
+struct Node{
+    int data ;
+    Node * next;    
+}*top = NULL;
+
+void push(int x ){
+    Node *t ;
+    t =new Node ;
+
+    if(t ==NULL){ //if it is unable to create linked list i.e point to NUll then stackFull
+        cout<<"Stack is Full ";
+    }
+    else{
+        t->data = x ;
+        t->next = top ;
+        top = t ;
+    }
+}
+
+int pop(){
+    Node *t  ;
+    int x =-1 ;
+    if(top ==NULL){ 
+        cout<<"Stack is Empty ";
+    }
+    else{
+        t = top ;
+        x = t->data ;
+        top = top->next ;
+        delete t ;
+    }
+    return x ;
+}
+
+void display(){
+    Node *p = top ;
+    while(p!=NULL){
+        cout<<p->data<<" " ;
+        p= p->next ;
+    }cout<<endl ;
+}
+
+int peek(int pos){
+    Node *p = top;
+    for(int i=0 ; i<pos-1 && p!=NULL ; i++){
+        p=p->next ;
+    }
+    if(p){
+        return p->data ;
+    }
+    else{
+        return -1 ;
+    }
+}
+
+int stackTop(){
+    if(top){
+        return top->data ;
+    }
+    return -1;
+}
+
+bool isEmpty(){
+    return top ? 0 : 1 ;
+}
+
+bool isFull(){
+    Node *t = new Node ;
+    int r = t ? 0 : 1 ;
+    delete t ;
+
+    return r ;
+}
+
+int main(){
+    push(5);
+    push(3);
+    push(9);
+    display() ;
+
+    cout<<"Peek at 2--> "<<peek(2)<<endl;
+    cout<<"POP is "<< pop()<<endl;
+    display() ;
+    cout<<"stacktop "<< stackTop()<<endl; 
+    cout<<"isEmpty "<<isEmpty()<<endl;
+    cout<<"isfull "<< isFull();
+
+    return  0;
+}
+
+#include<iostream>
+using namespace std ;
+
+struct Node{
+    int data ;
+    Node * next ;
+}*front=NULL , *rear=NULL;
+
+void enqueue(int x){
+    Node *t= new Node ;
+    if(t==NULL){
+        cout<<"Queue is full ";
+    }
+    else{
+        t->data=x ;
+        t->next=NULL;
+        if(front==NULL){
+            front=rear =t;
+        }
+        else{
+            rear->next = t;
+            rear = t ;
+        }
+    }
+}
+int dequeue(){
+    int x = -1 ;
+    Node *p ;
+    if(front==NULL){
+        cout<<"Queue is empty ";
+        return x ;
+    }
+    else{
+        p = front ;
+        front= front->next ;
+        x =p->data ;
+        delete p ;
+     
+    } return x;
+}
+void Display(){
+    Node *p = front ;
+    while(p!=NULL){
+        cout<<p->data<<" " ;
+        p=p->next ;
+    }
+}
+
+#include<iostream>
+using namespace std ;
+
+struct Queues{
+    int front ;
+    int rear ;
+    int size ;
+    int *Q ;
+};
+
+void create(Queues *q ,int s ){
+        q->front = q->rear = -1;
+        q->size = s ;
+        q->Q = new int [q->size ] ;
+}
+
+void enqueue(Queues *q , int x){
+    if(q->rear == q->size -1){
+        cout<<"Queue is Full ";
+    }
+    q->rear++;
+    q->Q[q->rear]= x ;
+}
+
+int dequeue(Queues *q){
+    int x=-1 ;
+    if(q->front ==q->rear){
+        cout<<"Queue is empty ";
+        return x ;
+    }
+    q->front++ ;
+    x = q->Q[q->front] ;
+    
+    return x ;
+}
+
+void Display(Queues q){
+    for(int i=q.front+1 ; i<=q.rear ; i++ ){
+        cout<<q.Q[i]<<" " ;
+    }
+}    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
 
 
+
+
+
+
+
+    
+    
