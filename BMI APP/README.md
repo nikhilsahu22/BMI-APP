@@ -1,3 +1,6 @@
+![Screenshot_20240204-065403](https://github.com/nikhilsahu22/BMI-APP/assets/129503232/8c2a77cb-6b20-44ee-b60a-b76f20190d02)
+![Screenshot_20240204-065811](https://github.com/nikhilsahu22/BMI-APP/assets/129503232/6ceb2dc5-4721-45a6-9bbe-c0de40b273cc)
+![Screenshot_20240204-065827](https://github.com/nikhilsahu22/BMI-APP/assets/129503232/34045ac6-8251-4624-84be-4beac66beaa7)
 # bmi
 
 A new Flutter project.
